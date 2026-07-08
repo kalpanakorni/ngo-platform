@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ripple — Together, help travels further</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#123B36;       /* deep teal ink */
+    --paper:#FBF7F0;     /* warm cream */
+    --amber:#E2A33D;     /* sunrise amber - primary CTA */
+    --ember:#E4623F;     /* coral ember - urgency/help */
+    --slate:#3E6E8E;     /* sky slate - info/links */
+    --charcoal:#24302C;
+    --ring:rgba(18,59,54,0.12);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper); color:var(--charcoal); font-family:'Inter',sans-serif;}
+  .font-display{font-family:'Fraunces',serif;}
+  .font-mono{font-family:'IBM Plex Mono',monospace;}
+  .page{display:none}
+  .page.active{display:block; animation:fadein .5s ease}
+  @keyframes fadein{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+
+  /* Ripple signature: concentric rings */
+  .ripple-wrap{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
+  .ripple{position:absolute; border-radius:50%; border:1.5px solid var(--ring); }
+  @keyframes expand{
+    0%{transform:scale(0.3); opacity:.9}
+    100%{transform:scale(1); opacity:0}
+  }
+  .ripple-anim{animation:expand 6s ease-out infinite;}
+  .divider-ripple{display:flex; align-items:center; gap:10px; justify-content:center; margin:0 auto;}
+  .divider-ripple span{width:6px; height:6px; border-radius:50%; background:var(--amber);}
+  .divider-ripple .line{height:1px; width:64px; background:var(--ring);}
+
+  .btn-primary{background:var(--amber); color:var(--ink); font-weight:700; transition:transform .15s ease, box-shadow .15s ease;}
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 20px -6px rgba(226,163,61,.6);}
+  .btn-ghost{border:1.5px solid var(--ink); color:var(--ink); transition:all .15s ease;}
+  .btn-ghost:hover{background:var(--ink); color:var(--paper);}
+  .card-hover{transition:transform .2s ease, box-shadow .2s ease;}
+  .card-hover:hover{transform:translateY(-4px); box-shadow:0 16px 32px -12px rgba(18,59,54,.18);}
+  .nav-link{position:relative; padding-bottom:2px;}
+  .nav-link::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:2px;background:var(--amber);transition:width .2s ease;}
+  .nav-link:hover::after, .nav-link.active-link::after{width:100%;}
+  ::-webkit-scrollbar{width:10px}
+  ::-webkit-scrollbar-thumb{background:var(--ring); border-radius:8px}
+
+  .progress-track{background:var(--ring); border-radius:999px; overflow:hidden;}
+  .progress-fill{background:linear-gradient(90deg, var(--amber), var(--ember)); height:100%; border-radius:999px;}
+
+  #chat-panel{transform:translateY(24px) scale(.97); opacity:0; pointer-events:none; transition:all .25s ease;}
+  #chat-panel.open{transform:translateY(0) scale(1); opacity:1; pointer-events:auto;}
+
+  input[type=text], input[type=email], input[type=tel], input[type=number], textarea, select{
+    border:1.5px solid var(--ring); background:#fff; border-radius:10px; padding:10px 14px; width:100%; outline:none;
+  }
+  input:focus, textarea:focus, select:focus{border-color:var(--amber); box-shadow:0 0 0 3px rgba(226,163,61,.2);}
+  .tab-btn.active{background:var(--ink); color:var(--paper);}
+  .dark body{background:var(--ink)}
+</style>
+</head>
+<body class="antialiased">
+
+<!-- ============ NAV ============ -->
+<header class="sticky top-0 z-40 backdrop-blur bg-[var(--paper)]/90 border-b border-[var(--ring)]">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#home" class="flex items-center gap-2 font-display text-2xl font-semibold text-[var(--ink)]">
+      <span class="w-3 h-3 rounded-full bg-[var(--amber)] inline-block"></span> Ripple
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-sm font-medium" id="nav-links">
+      <a href="#home" class="nav-link" data-nav="home">Home</a>
+      <a href="#about" class="nav-link" data-nav="about">About</a>
+      <a href="#campaigns" class="nav-link" data-nav="campaigns">Campaigns</a>
+      <a href="#volunteer" class="nav-link" data-nav="volunteer">Volunteer</a>
+      <a href="#help" class="nav-link" data-nav="help">Request Help</a>
+      <a href="#contact" class="nav-link" data-nav="contact">Contact</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <button id="theme-toggle" aria-label="Toggle dark mode" class="hidden sm:flex w-9 h-9 rounded-full border border-[var(--ring)] items-center justify-center text-sm">🌙</button>
+      <a href="#donate" class="btn-primary px-5 py-2.5 rounded-full text-sm">Donate</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<section id="page-home" class="page">
+  <div class="relative overflow-hidden">
+    <div class="ripple-wrap">
+      <div class="ripple ripple-anim" style="width:200px;height:200px;left:8%;top:20%;"></div>
+      <div class="ripple ripple-anim" style="width:200px;height:200px;left:8%;top:20%;animation-delay:2s;"></div>
+      <div class="ripple ripple-anim" style="width:200px;height:200px;left:8%;top:20%;animation-delay:4s;"></div>
+      <div class="ripple ripple-anim" style="width:260px;height:260px;right:6%;top:55%;"></div>
+      <div class="ripple ripple-anim" style="width:260px;height:260px;right:6%;top:55%;animation-delay:3s;"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 pt-20 pb-24 relative">
+      <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-4">Community relief · Education · Emergency aid</p>
+      <h1 class="font-display text-5xl md:text-7xl leading-[1.05] max-w-3xl text-[var(--ink)]">One gift rarely stops<br/> where it lands.</h1>
+      <p class="mt-6 max-w-xl text-lg text-[var(--charcoal)]/80">Ripple connects donors, volunteers, and people in need — turning a single act of giving into food delivered, classrooms rebuilt, and families housed.</p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href="#donate" class="btn-primary px-7 py-3.5 rounded-full">Donate now</a>
+        <a href="#volunteer" class="btn-ghost px-7 py-3.5 rounded-full">Become a volunteer</a>
+        <a href="#help" class="px-7 py-3.5 rounded-full text-[var(--ember)] font-semibold underline decoration-2 underline-offset-4">Request help →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact stats -->
+  <div class="border-y border-[var(--ring)] bg-white/60">
+    <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div><div class="font-display text-4xl text-[var(--ink)]" data-count="482300">0</div><p class="font-mono text-xs uppercase tracking-wide text-[var(--charcoal)]/60 mt-1">Raised (USD)</p></div>
+      <div><div class="font-display text-4xl text-[var(--ink)]" data-count="18400">0</div><p class="font-mono text-xs uppercase tracking-wide text-[var(--charcoal)]/60 mt-1">People helped</p></div>
+      <div><div class="font-display text-4xl text-[var(--ink)]" data-count="2760">0</div><p class="font-mono text-xs uppercase tracking-wide text-[var(--charcoal)]/60 mt-1">Active volunteers</p></div>
+      <div><div class="font-display text-4xl text-[var(--ink)]" data-count="63">0</div><p class="font-mono text-xs uppercase tracking-wide text-[var(--charcoal)]/60 mt-1">Ongoing campaigns</p></div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-20">
+    <div class="flex items-end justify-between mb-8">
+      <h2 class="font-display text-3xl text-[var(--ink)]">Featured campaigns</h2>
+      <a href="#campaigns" class="text-sm font-semibold text-[var(--slate)] nav-link" data-nav="campaigns">View all →</a>
+    </div>
+    <div id="home-campaigns" class="grid md:grid-cols-3 gap-6"></div>
+  </div>
+
+  <div class="divider-ripple py-4"><span></span><div class="line"></div><span></span></div>
+
+  <div class="max-w-7xl mx-auto px-6 py-16">
+    <h2 class="font-display text-3xl text-[var(--ink)] mb-10 text-center">Voices from the field</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <blockquote class="bg-white rounded-2xl p-6 border border-[var(--ring)] card-hover">
+        <p class="text-[var(--charcoal)]/90">"The clean water project reached our village in six weeks. My children haven't been sick since."</p>
+        <footer class="mt-4 font-mono text-xs text-[var(--slate)]">— Amara, Water Access Program</footer>
+      </blockquote>
+      <blockquote class="bg-white rounded-2xl p-6 border border-[var(--ring)] card-hover">
+        <p class="text-[var(--charcoal)]/90">"Volunteering here turned a spare Saturday into the most useful day of my week, every week."</p>
+        <footer class="mt-4 font-mono text-xs text-[var(--slate)]">— Daniel, Volunteer since 2023</footer>
+      </blockquote>
+      <blockquote class="bg-white rounded-2xl p-6 border border-[var(--ring)] card-hover">
+        <p class="text-[var(--charcoal)]/90">"Monthly giving felt small until I saw the school we helped rebuild finish its second year."</p>
+        <footer class="mt-4 font-mono text-xs text-[var(--slate)]">— Priya, Monthly Donor</footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="page-about" class="page">
+  <div class="max-w-5xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Our story</p>
+    <h1 class="font-display text-4xl md:text-5xl text-[var(--ink)] mb-6">Founded on one idea: help should never stop at the first hand.</h1>
+    <p class="text-lg text-[var(--charcoal)]/80 leading-relaxed">Ripple began in 2011 as a small volunteer network responding to flood relief in three villages. Today we run education, medical, and disaster-response programs across 14 regions — but the model hasn't changed: every donation is tracked to the person or place it reaches, and every volunteer hour compounds into something bigger than any one gift.</p>
+
+    <div class="grid md:grid-cols-2 gap-8 mt-14">
+      <div class="bg-white rounded-2xl p-8 border border-[var(--ring)]">
+        <h3 class="font-display text-2xl text-[var(--ink)] mb-2">Mission</h3>
+        <p class="text-[var(--charcoal)]/80">Close the gap between people who can give and people who need help — quickly, transparently, and with dignity on both sides.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-8 border border-[var(--ring)]">
+        <h3 class="font-display text-2xl text-[var(--ink)] mb-2">Vision</h3>
+        <p class="text-[var(--charcoal)]/80">A world where emergency aid, education, and healthcare reach every community within days, not years, of being needed.</p>
+      </div>
+    </div>
+
+    <h3 class="font-display text-2xl text-[var(--ink)] mt-16 mb-6">Our team</h3>
+    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="text-center"><div class="w-20 h-20 rounded-full bg-[var(--amber)]/30 mx-auto mb-3 flex items-center justify-center font-display text-xl text-[var(--ink)]">MK</div><p class="font-semibold text-sm">Maya Khan</p><p class="text-xs text-[var(--charcoal)]/60">Executive Director</p></div>
+      <div class="text-center"><div class="w-20 h-20 rounded-full bg-[var(--ember)]/30 mx-auto mb-3 flex items-center justify-center font-display text-xl text-[var(--ink)]">RT</div><p class="font-semibold text-sm">Rafael Torres</p><p class="text-xs text-[var(--charcoal)]/60">Programs Lead</p></div>
+      <div class="text-center"><div class="w-20 h-20 rounded-full bg-[var(--slate)]/30 mx-auto mb-3 flex items-center justify-center font-display text-xl text-[var(--ink)]">SO</div><p class="font-semibold text-sm">Sena Okafor</p><p class="text-xs text-[var(--charcoal)]/60">Volunteer Coordinator</p></div>
+      <div class="text-center"><div class="w-20 h-20 rounded-full bg-[var(--ink)]/20 mx-auto mb-3 flex items-center justify-center font-display text-xl text-[var(--ink)]">JL</div><p class="font-semibold text-sm">Jin Lee</p><p class="text-xs text-[var(--charcoal)]/60">Finance & Transparency</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DONATE ============ -->
+<section id="page-donate" class="page">
+  <div class="max-w-4xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Give</p>
+    <h1 class="font-display text-4xl text-[var(--ink)] mb-2">Make a donation</h1>
+    <p class="text-[var(--charcoal)]/70 mb-10">Every donation is receipted and traceable to a program. Payments are processed securely — this demo simulates checkout without moving real funds.</p>
+
+    <form id="donate-form" class="bg-white rounded-2xl border border-[var(--ring)] p-8 space-y-6">
+      <div>
+        <label class="text-sm font-semibold block mb-2">Frequency</label>
+        <div class="flex gap-3">
+          <button type="button" data-freq="one-time" class="freq-btn tab-btn active px-5 py-2 rounded-full border border-[var(--ring)] text-sm">One-time</button>
+          <button type="button" data-freq="monthly" class="freq-btn tab-btn px-5 py-2 rounded-full border border-[var(--ring)] text-sm">Monthly</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold block mb-2">Amount (USD)</label>
+        <div class="flex flex-wrap gap-3 mb-3">
+          <button type="button" class="amt-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm" data-amt="25">$25</button>
+          <button type="button" class="amt-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm" data-amt="50">$50</button>
+          <button type="button" class="amt-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm" data-amt="100">$100</button>
+          <button type="button" class="amt-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm" data-amt="250">$250</button>
+        </div>
+        <input type="number" min="1" id="donate-amount" placeholder="Custom amount" required />
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold block mb-2">Direct my gift to</label>
+        <select id="donate-cause">
+          <option value="general">Where it's needed most</option>
+          <option value="medical">Medical relief</option>
+          <option value="education">Education</option>
+          <option value="disaster">Disaster response</option>
+          <option value="water">Clean water access</option>
+        </select>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="text-sm font-semibold block mb-2">Full name</label><input type="text" id="donate-name" required /></div>
+        <div><label class="text-sm font-semibold block mb-2">Email</label><input type="email" id="donate-email" required /></div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="donate-anon" class="w-4 h-4" /> Give anonymously</label>
+
+      <div class="border-t border-[var(--ring)] pt-6">
+        <label class="text-sm font-semibold block mb-2">Card details (demo only — no real charge)</label>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <input type="text" placeholder="4242 4242 4242 4242" class="sm:col-span-3" />
+          <input type="text" placeholder="MM / YY" />
+          <input type="text" placeholder="CVC" />
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary w-full py-3.5 rounded-full">Complete donation</button>
+      <p id="donate-success" class="hidden text-center text-[var(--ink)] font-semibold bg-[var(--amber)]/20 rounded-xl py-3">Thank you! Your gift has been recorded and a receipt is on its way to your email. 💛</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ VOLUNTEER ============ -->
+<section id="page-volunteer" class="page">
+  <div class="max-w-6xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Get involved</p>
+    <h1 class="font-display text-4xl text-[var(--ink)] mb-10">Volunteer with us</h1>
+
+    <div class="grid lg:grid-cols-2 gap-12">
+      <div>
+        <h3 class="font-display text-2xl text-[var(--ink)] mb-4">Open opportunities</h3>
+        <div class="flex gap-3 mb-5">
+          <select id="vol-filter-location" class="!w-auto"><option value="">Any location</option><option>Remote</option><option>Nairobi</option><option>Manila</option><option>Chicago</option></select>
+          <select id="vol-filter-skill" class="!w-auto"><option value="">Any skill</option><option>Logistics</option><option>Medical</option><option>Teaching</option><option>Design</option></select>
+        </div>
+        <div id="vol-opportunities" class="space-y-4"></div>
+      </div>
+
+      <form id="volunteer-form" class="bg-white rounded-2xl border border-[var(--ring)] p-8 space-y-5 h-fit">
+        <h3 class="font-display text-2xl text-[var(--ink)]">Apply now</h3>
+        <div><label class="text-sm font-semibold block mb-2">Full name</label><input type="text" required /></div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div><label class="text-sm font-semibold block mb-2">Email</label><input type="email" required /></div>
+          <div><label class="text-sm font-semibold block mb-2">Phone</label><input type="tel" /></div>
+        </div>
+        <div><label class="text-sm font-semibold block mb-2">Location</label><input type="text" placeholder="City, Country" required /></div>
+        <div><label class="text-sm font-semibold block mb-2">Skills</label><input type="text" placeholder="e.g. Teaching, Logistics" /></div>
+        <div><label class="text-sm font-semibold block mb-2">Availability</label>
+          <select><option>Flexible</option><option>Weekdays</option><option>Weekends</option></select>
+        </div>
+        <div><label class="text-sm font-semibold block mb-2">Why do you want to volunteer?</label><textarea rows="3"></textarea></div>
+        <button type="submit" class="btn-primary w-full py-3 rounded-full">Submit application</button>
+        <p id="volunteer-success" class="hidden text-center text-[var(--ink)] font-semibold bg-[var(--amber)]/20 rounded-xl py-3">Thanks for stepping up! We'll email you within 3 business days.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAMPAIGNS ============ -->
+<section id="page-campaigns" class="page">
+  <div class="max-w-7xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Fundraising</p>
+    <h1 class="font-display text-4xl text-[var(--ink)] mb-8">Active campaigns</h1>
+    <div class="flex flex-wrap gap-3 mb-10" id="campaign-filters">
+      <button data-cat="all" class="cat-btn tab-btn active px-4 py-2 rounded-full border border-[var(--ring)] text-sm">All</button>
+      <button data-cat="medical" class="cat-btn tab-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm">Medical</button>
+      <button data-cat="education" class="cat-btn tab-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm">Education</button>
+      <button data-cat="disaster" class="cat-btn tab-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm">Disaster relief</button>
+      <button data-cat="water" class="cat-btn tab-btn px-4 py-2 rounded-full border border-[var(--ring)] text-sm">Water</button>
+    </div>
+    <div id="campaigns-grid" class="grid md:grid-cols-3 gap-6"></div>
+  </div>
+</section>
+
+<!-- ============ REQUEST HELP ============ -->
+<section id="page-help" class="page">
+  <div class="max-w-3xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--ember)] mb-3">We're here</p>
+    <h1 class="font-display text-4xl text-[var(--ink)] mb-2">Request assistance</h1>
+    <p class="text-[var(--charcoal)]/70 mb-10">Tell us what's going on. A coordinator reviews every request within 24 hours; critical cases are triaged immediately.</p>
+    <form id="help-form" class="bg-white rounded-2xl border border-[var(--ring)] p-8 space-y-5">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="text-sm font-semibold block mb-2">Full name</label><input type="text" required /></div>
+        <div><label class="text-sm font-semibold block mb-2">Email</label><input type="email" required /></div>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="text-sm font-semibold block mb-2">Category</label>
+          <select required><option value="">Select one</option><option>Medical</option><option>Education</option><option>Disaster relief</option><option>Hunger</option><option>Shelter</option><option>Other</option></select>
+        </div>
+        <div><label class="text-sm font-semibold block mb-2">Urgency</label>
+          <select><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+        </div>
+      </div>
+      <div><label class="text-sm font-semibold block mb-2">Location</label><input type="text" required /></div>
+      <div><label class="text-sm font-semibold block mb-2">Describe your situation</label><textarea rows="4" required></textarea></div>
+      <button type="submit" class="w-full py-3.5 rounded-full text-white font-bold" style="background:var(--ember)">Submit request</button>
+      <p id="help-success" class="hidden text-center text-[var(--ink)] font-semibold bg-[var(--amber)]/20 rounded-xl py-3">Received. A coordinator will reach out shortly — check your email.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="page-contact" class="page">
+  <div class="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12">
+    <div>
+      <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Say hello</p>
+      <h1 class="font-display text-4xl text-[var(--ink)] mb-6">Contact us</h1>
+      <form id="contact-form" class="bg-white rounded-2xl border border-[var(--ring)] p-8 space-y-5">
+        <div><label class="text-sm font-semibold block mb-2">Name</label><input type="text" required /></div>
+        <div><label class="text-sm font-semibold block mb-2">Email</label><input type="email" required /></div>
+        <div><label class="text-sm font-semibold block mb-2">Message</label><textarea rows="4" required></textarea></div>
+        <button type="submit" class="btn-primary w-full py-3 rounded-full">Send message</button>
+        <p id="contact-success" class="hidden text-center text-[var(--ink)] font-semibold bg-[var(--amber)]/20 rounded-xl py-3">Message sent — we'll reply within 2 business days.</p>
+      </form>
+      <div class="mt-8 space-y-2 text-sm text-[var(--charcoal)]/80">
+        <p>📍 118 Harbor Lane, Nairobi, Kenya</p>
+        <p>✉️ hello@ripple.org</p>
+        <p>☎️ +254 700 000 000</p>
+      </div>
+      <div class="flex gap-4 mt-4 text-sm font-semibold text-[var(--slate)]">
+        <a href="#">Instagram</a><a href="#">X</a><a href="#">LinkedIn</a>
+      </div>
+    </div>
+    <div class="rounded-2xl overflow-hidden border border-[var(--ring)] min-h-[420px]">
+      <iframe title="map" class="w-full h-full min-h-[420px]" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=36.75%2C-1.35%2C36.90%2C-1.20&layer=mapnik"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ADMIN DASHBOARD ============ -->
+<section id="page-admin" class="page">
+  <div class="max-w-7xl mx-auto px-6 py-20">
+    <p class="font-mono text-xs tracking-widest uppercase text-[var(--slate)] mb-3">Internal</p>
+    <h1 class="font-display text-4xl text-[var(--ink)] mb-8">Admin dashboard</h1>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div class="bg-white rounded-2xl border border-[var(--ring)] p-6"><p class="font-mono text-xs uppercase text-[var(--charcoal)]/60">Total raised</p><p class="font-display text-3xl text-[var(--ink)] mt-1">$482,300</p></div>
+      <div class="bg-white rounded-2xl border border-[var(--ring)] p-6"><p class="font-mono text-xs uppercase text-[var(--charcoal)]/60">Donations this month</p><p class="font-display text-3xl text-[var(--ink)] mt-1">1,204</p></div>
+      <div class="bg-white rounded-2xl border border-[var(--ring)] p-6"><p class="font-mono text-xs uppercase text-[var(--charcoal)]/60">Volunteers pending</p><p class="font-display text-3xl text-[var(--ink)] mt-1">37</p></div>
+      <div class="bg-white rounded-2xl border border-[var(--ring)] p-6"><p class="font-mono text-xs uppercase text-[var(--charcoal)]/60">Help requests open</p><p class="font-display text-3xl text-[var(--ink)] mt-1">12</p></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-[var(--ring)] p-6 overflow-x-auto">
+      <h3 class="font-display text-xl text-[var(--ink)] mb-4">Recent donations</h3>
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-[var(--charcoal)]/60 border-b border-[var(--ring)]"><th class="py-2">Donor</th><th>Campaign</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="admin-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="border-t border-[var(--ring)] mt-10">
+  <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--charcoal)]/60">
+    <p>© 2026 Ripple. All rights reserved.</p>
+    <div class="flex gap-6">
+      <a href="#about" class="nav-link" data-nav="about">About</a>
+      <a href="#contact" class="nav-link" data-nav="contact">Contact</a>
+      <a href="#admin" class="nav-link" data-nav="admin">Admin</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ CHATBOT ============ -->
+<button id="chat-fab" aria-label="Open chat" class="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full btn-primary shadow-xl flex items-center justify-center text-2xl">💬</button>
+
+<div id="chat-panel" class="fixed bottom-24 right-6 z-50 w-[90vw] max-w-sm bg-white rounded-2xl border border-[var(--ring)] shadow-2xl flex flex-col overflow-hidden" style="height:480px;">
+  <div class="p-4 flex items-center gap-2" style="background:var(--ink)">
+    <span class="w-2.5 h-2.5 rounded-full bg-[var(--amber)]"></span>
+    <p class="text-[var(--paper)] font-display text-lg">Ripple Assistant</p>
+  </div>
+  <div id="chat-log" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm"></div>
+  <div class="p-3 border-t border-[var(--ring)] flex gap-2">
+    <input id="chat-input" type="text" placeholder="Ask about donating, volunteering…" class="!rounded-full" />
+    <button id="chat-send" class="btn-primary px-4 rounded-full text-sm">Send</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- Router ---------------- */
+const pages = ['home','about','donate','volunteer','campaigns','help','contact','admin'];
+function route(){
+  const hash = (location.hash || '#home').replace('#','');
+  const target = pages.includes(hash) ? hash : 'home';
+  pages.forEach(p => document.getElementById('page-'+p).classList.toggle('active', p===target));
+  document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('active-link', a.dataset.nav===target));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+window.addEventListener('hashchange', route);
+route();
+
+/* ---------------- Theme toggle ---------------- */
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+});
+
+/* ---------------- Impact counters ---------------- */
+function animateCounters(){
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count, 10);
+    let cur = 0; const step = Math.ceil(target/60);
+    const t = setInterval(() => {
+      cur += step;
+      if(cur >= target){cur = target; clearInterval(t);}
+      el.textContent = cur.toLocaleString();
+    }, 20);
+  });
+}
+animateCounters();
+
+/* ---------------- Mock data ---------------- */
+const CAMPAIGNS = [
+  {title:"Emergency Flood Relief — Manila", cat:"disaster", raised:38200, goal:60000, img:"🌊"},
+  {title:"Mobile Medical Clinics — Nairobi", cat:"medical", raised:52100, goal:80000, img:"🩺"},
+  {title:"Rebuild Sunrise School", cat:"education", raised:21500, goal:45000, img:"📚"},
+  {title:"Clean Water Wells — Kilifi", cat:"water", raised:14800, goal:30000, img:"💧"},
+  {title:"Winter Shelter Drive", cat:"disaster", raised:9200, goal:25000, img:"🏕️"},
+  {title:"Scholarships for Girls", cat:"education", raised:33900, goal:50000, img:"🎓"},
+];
+
+function campaignCard(c){
+  const pct = Math.min(100, Math.round((c.raised/c.goal)*100));
+  return `<div class="bg-white rounded-2xl border border-[var(--ring)] p-6 card-hover">
+    <div class="text-4xl mb-4">${c.img}</div>
+    <h3 class="font-display text-xl text-[var(--ink)] mb-2">${c.title}</h3>
+    <div class="progress-track h-2 mb-2"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <p class="text-xs font-mono text-[var(--charcoal)]/60 mb-4">$${c.raised.toLocaleString()} raised of $${c.goal.toLocaleString()} · ${pct}%</p>
+    <div class="flex gap-3">
+      <a href="#donate" class="btn-primary px-4 py-2 rounded-full text-xs flex-1 text-center">Donate</a>
+      <button class="btn-ghost px-4 py-2 rounded-full text-xs" onclick="navigator.clipboard && navigator.clipboard.writeText(location.href); this.textContent='Copied!'">Share</button>
+    </div>
+  </div>`;
+}
+document.getElementById('home-campaigns').innerHTML = CAMPAIGNS.slice(0,3).map(campaignCard).join('');
+
+function renderCampaigns(cat='all'){
+  const list = cat==='all' ? CAMPAIGNS : CAMPAIGNS.filter(c=>c.cat===cat);
+  document.getElementById('campaigns-grid').innerHTML = list.map(campaignCard).join('');
+}
+renderCampaigns();
+document.querySelectorAll('.cat-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCampaigns(btn.dataset.cat);
+  });
+});
+
+/* ---------------- Volunteer opportunities ---------------- */
+const OPPS = [
+  {role:"Field Logistics Coordinator", location:"Nairobi", skill:"Logistics"},
+  {role:"Remote Grant Writer", location:"Remote", skill:"Design"},
+  {role:"Clinic Nurse Assistant", location:"Manila", skill:"Medical"},
+  {role:"After-school Tutor", location:"Chicago", skill:"Teaching"},
+];
+function renderOpps(){
+  const loc = document.getElementById('vol-filter-location').value;
+  const skill = document.getElementById('vol-filter-skill').value;
+  const list = OPPS.filter(o => (!loc || o.location===loc) && (!skill || o.skill===skill));
+  document.getElementById('vol-opportunities').innerHTML = list.map(o => `
+    <div class="bg-white rounded-xl border border-[var(--ring)] p-5 flex items-center justify-between card-hover">
+      <div><p class="font-semibold">${o.role}</p><p class="text-xs text-[var(--charcoal)]/60 font-mono">${o.location} · ${o.skill}</p></div>
+      <a href="#volunteer" class="btn-ghost px-4 py-1.5 rounded-full text-xs">Apply</a>
+    </div>`).join('') || `<p class="text-sm text-[var(--charcoal)]/60">No matching opportunities — try widening your filters.</p>`;
+}
+renderOpps();
+document.getElementById('vol-filter-location').addEventListener('change', renderOpps);
+document.getElementById('vol-filter-skill').addEventListener('change', renderOpps);
+
+/* ---------------- Donate form interactions ---------------- */
+document.querySelectorAll('.amt-btn').forEach(b=>b.addEventListener('click', ()=>{
+  document.getElementById('donate-amount').value = b.dataset.amt;
+}));
+document.querySelectorAll('.freq-btn').forEach(b=>b.addEventListener('click', ()=>{
+  document.querySelectorAll('.freq-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+/* ---------------- Form submissions (demo — no backend call) ---------------- */
+function wireForm(formId, successId){
+  const form = document.getElementById(formId);
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    document.getElementById(successId).classList.remove('hidden');
+    setTimeout(()=>document.getElementById(successId).classList.add('hidden'), 6000);
+    form.reset();
+  });
+}
+wireForm('donate-form','donate-success');
+wireForm('volunteer-form','volunteer-success');
+wireForm('help-form','help-success');
+wireForm('contact-form','contact-success');
+
+/* ---------------- Admin table ---------------- */
+const donors = ["A. Ngugi","M. Santos","J. Cohen","P. Rao","L. Dubois","Anonymous"];
+document.getElementById('admin-table').innerHTML = Array.from({length:6}).map((_,i)=>`
+  <tr class="border-b border-[var(--ring)] last:border-0">
+    <td class="py-2">${donors[i]}</td>
+    <td>${CAMPAIGNS[i%CAMPAIGNS.length].title}</td>
+    <td>$${(25+i*37)}</td>
+    <td class="font-mono text-xs">2026-07-0${i+1}</td>
+    <td><span class="text-xs px-2 py-1 rounded-full bg-[var(--amber)]/20 text-[var(--ink)] font-semibold">Completed</span></td>
+  </tr>`).join('');
+
+/* ---------------- Chatbot (local FAQ engine, mirrors backend/utils/chatbotEngine.js) ---------------- */
+const FAQ = [
+  {kw:['donate','donation','give money','contribute'], a:"You can donate on the Donate page — one-time or monthly, to any cause. Want me to take you there?", link:'#donate', linkLabel:'Go to Donate'},
+  {kw:['volunteer','volunteering','help out','join'], a:"We'd love your help! Check open roles on the Volunteer page, filtered by location and skill.", link:'#volunteer', linkLabel:'Go to Volunteer'},
+  {kw:['request help','need help','assistance'], a:"If you or someone you know needs support, use the Request Help page — a coordinator responds within 24 hours.", link:'#help', linkLabel:'Go to Request Help'},
+  {kw:['campaign','fundraiser','project'], a:"See all active fundraisers with live progress bars on the Campaigns page.", link:'#campaigns', linkLabel:'Go to Campaigns'},
+  {kw:['contact','phone','email','reach','address'], a:"You can reach our team through the Contact page — form, map, and social links included.", link:'#contact', linkLabel:'Go to Contact'},
+  {kw:['about','mission','vision','who are you'], a:"Ripple is a nonprofit running relief, education, and health programs since 2011. Read our story on the About page.", link:'#about', linkLabel:'Go to About'},
+  {kw:['tax','receipt','deductible'], a:"Yes — donations over $10 automatically generate a tax-deductible receipt sent to your email."},
+  {kw:['recurring','monthly','cancel'], a:"Monthly donations can be paused or cancelled anytime from your account dashboard."},
+];
+function chatReply(msg){
+  const text = msg.toLowerCase();
+  let best=null, score=0;
+  FAQ.forEach(e=>{ const s = e.kw.reduce((a,k)=>text.includes(k)?a+1:a,0); if(s>score){score=s; best=e;} });
+  if(best) return best;
+  return {a:"I don't have an exact answer for that yet — try asking about donating, volunteering, campaigns, or use the Contact page to reach our team."};
+}
+const chatFab = document.getElementById('chat-fab');
+const chatPanel = document.getElementById('chat-panel');
+const chatLog = document.getElementById('chat-log');
+function addMsg(text, from){
+  const bubble = document.createElement('div');
+  bubble.className = from==='bot'
+    ? "bg-[var(--paper)] border border-[var(--ring)] rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%]"
+    : "bg-[var(--ink)] text-[var(--paper)] rounded-2xl rounded-tr-sm px-4 py-2 max-w-[85%] ml-auto";
+  bubble.textContent = text;
+  chatLog.appendChild(bubble);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+let greeted = false;
+chatFab.addEventListener('click', ()=>{
+  chatPanel.classList.toggle('open');
+  if(!greeted){ addMsg("Hi! I'm the Ripple assistant. Ask me about donating, volunteering, campaigns, or how to get help.", 'bot'); greeted = true; }
+});
+function sendChat(){
+  const input = document.getElementById('chat-input');
+  const val = input.value.trim();
+  if(!val) return;
+  addMsg(val, 'user');
+  input.value='';
+  setTimeout(()=>{
+    const r = chatReply(val);
+    addMsg(r.a, 'bot');
+    if(r.link){
+      const a = document.createElement('a');
+      a.href = r.link; a.textContent = r.linkLabel;
+      a.className = "block text-xs font-semibold text-[var(--slate)] underline mt-1";
+      chatLog.appendChild(a);
+    }
+  }, 400);
+}
+document.getElementById('chat-send').addEventListener('click', sendChat);
+document.getElementById('chat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+</script>
+</body>
+</html>
